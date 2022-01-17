@@ -7,7 +7,7 @@ use std::process::exit;
 
 fn main() {
   match try_main() {
-    Err(error) if !matches!(error, Error::ParseError) => {
+    Err(error) if !matches!(error, Error::Parse) => {
       eprintln!("{}", error);
       exit(-1);
     }
@@ -45,7 +45,7 @@ fn try_main() -> Result<(), Error> {
       .generate_program(),
     _ => Driver::from(stdin()).generate_program(),
   }
-  .map_err(|_| Error::ParseError)?;
+  .map_err(|_| Error::Parse)?;
   // generate LLVM IR and write to output
   match output {
     Some(file) => LlvmGenerator::from_path(file)
@@ -53,15 +53,15 @@ fn try_main() -> Result<(), Error> {
       .generate_on(&program),
     _ => LlvmGenerator::new(stdout()).generate_on(&program),
   }
-  .map_err(Error::GenerateError)
+  .map_err(Error::Generate)
 }
 
 enum Error {
   InvalidArguments,
   InvalidInputFile(IoError),
-  ParseError,
+  Parse,
   InvalidOutputFile(IoError),
-  GenerateError(IoError),
+  Generate(IoError),
 }
 
 impl fmt::Display for Error {
@@ -77,9 +77,9 @@ Options:
   -h, --help: display this message"#
       ),
       Error::InvalidInputFile(e) => write!(f, "invalid input: {}", e),
-      Error::ParseError => Ok(()),
+      Error::Parse => Ok(()),
       Error::InvalidOutputFile(e) => write!(f, "invalid output: {}", e),
-      Error::GenerateError(e) => write!(f, "I/O error: {}", e),
+      Error::Generate(e) => write!(f, "I/O error: {}", e),
     }
   }
 }
