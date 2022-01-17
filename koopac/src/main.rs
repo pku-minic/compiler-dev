@@ -23,6 +23,8 @@ fn try_main() -> Result<(), Error> {
   args.next();
   loop {
     match (args.next(), args.next()) {
+      (Some(h), _) if h == "-h" => return Err(Error::InvalidArguments),
+      (Some(help), _) if help == "--help" => return Err(Error::InvalidArguments),
       (Some(file), None) => input = Some(file),
       (Some(file), Some(o)) if o == "-o" => {
         input = Some(file);
@@ -67,11 +69,12 @@ impl fmt::Display for Error {
     match self {
       Error::InvalidArguments => write!(
         f,
-        r#"usage: koopac [INPUT] [-o OUTPUT]
+        r#"usage: koopac [INPUT] [-o OUTPUT] [-h|--help]
 
 Options:
-  INPUT:  input file, default to stdin
-  OUTPUT: output file, default to stdout"#
+  INPUT:      input file, default to stdin
+  OUTPUT:     output file, default to stdout
+  -h, --help: display this message"#
       ),
       Error::InvalidInputFile(e) => write!(f, "invalid input: {}", e),
       Error::ParseError => Ok(()),
