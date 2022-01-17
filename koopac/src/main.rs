@@ -6,9 +6,12 @@ use std::io::{stdin, stdout, Error as IoError};
 use std::process::exit;
 
 fn main() {
-  if let Err(error) = try_main() {
-    eprintln!("{}", error);
-    exit(-1);
+  match try_main() {
+    Err(error) if !matches!(error, Error::ParseError) => {
+      eprintln!("{}", error);
+      exit(-1);
+    }
+    _ => {}
   }
 }
 
@@ -64,14 +67,14 @@ impl fmt::Display for Error {
     match self {
       Error::InvalidArguments => write!(
         f,
-        r#"usage: koopac [INPUT] -o [OUTPUT]
+        r#"usage: koopac [INPUT] [-o OUTPUT]
 
 Options:
   INPUT:  input file, default to stdin
   OUTPUT: output file, default to stdout"#
       ),
       Error::InvalidInputFile(e) => write!(f, "invalid input: {}", e),
-      Error::ParseError => write!(f, "invalid Koopa IR program"),
+      Error::ParseError => Ok(()),
       Error::InvalidOutputFile(e) => write!(f, "invalid output: {}", e),
       Error::GenerateError(e) => write!(f, "I/O error: {}", e),
     }
