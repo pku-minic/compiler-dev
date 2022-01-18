@@ -1,4 +1,13 @@
-FROM ubuntu:20.04
+# base image
+FROM ubuntu:20.04 as compiler-dev-base
+
+# some arguments
+ARG KOOPA_REPO_URL=https://github.com/pku-minic/koopa.git
+ARG KOOPAC=koopac.tar.gz
+ARG SYSYRT_REPO_URL=https://github.com/pku-minic/sysy-runtime-lib.git
+ARG AUTOTEST=autotest
+ARG LIB_INSTALL_DIR=/opt/lib
+ARG BIN_INSTALL_DIR=/opt/bin
 
 # setup APT mirror
 RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse" > /etc/apt/sources.list && \
@@ -24,7 +33,8 @@ RUN apt update && apt install -y \
 # setup LLVM toolchain
 WORKDIR /root
 COPY update-alternatives-clang.sh .
-RUN bash update-alternatives-clang.sh 13 100 && rm update-alternatives-clang.sh
+RUN bash update-alternatives-clang.sh 13 100 && \
+  rm update-alternatives-clang.sh
 
 # install Rust toolchain
 RUN wget -O - https://sh.rustup.rs | sh -s -- -y && \
@@ -41,16 +51,49 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN git config --global url."https://hub.fastgit.org/".insteadOf "https://github.com/" && \
   git config --global protocol.https.allow always
 
+# setup install directories
+RUN mkdir -p ${LIB_INSTALL_DIR} ${BIN_INSTALL_DIR}
+ENV CDE_LIBRARY_PATH="${LIB_INSTALL_DIR}"
+ENV PATH="${BIN_INSTALL_DIR}:${PATH}"
+
 # install libkoopa
-# TODO
+WORKDIR ${LIB_INSTALL_DIR}
+RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
+  cargo build --release --manifest-path koopa/crates/libkoopa/Cargo.toml && \
+  cp koopa/target/release/libkoopa.a koopa/target/release/libkoopa.so . && \
+  rm -rf koopa
 
 # install koopac
-# TODO
+WORKDIR ${BIN_INSTALL_DIR}
+COPY ${KOOPAC} .
+RUN mkdir kpc && tar xzf ${KOOPAC} -C kpc && \
+  cargo build --release --manifest-path kpc/Cargo.toml && \
+  cp kpc/target/release/koopac . && \
+  rm -rf ${KOOPAC} kpc
 
 # install SysY runtime library
-# TODO
+WORKDIR ${LIB_INSTALL_DIR}
+RUN git clone --single-branch --depth 1 ${SYSYRT_REPO_URL} sysyrt && \
+  make NO_LIBC=1 \
+       ADD_CFLAGS="-target riscv32-unknown-linux-elf -march=rv32im -mabi=ilp32" \
+       -C sysyrt libsysy && \
+  cp sysyrt/build/libsysy.a . && \
+  rm -rf sysyrt
+
+
+# compiler development environment image
+FROM compiler-dev-base as compiler-dev
+
+# some arguments
+ARG AUTOTEST
+ARG BIN_INSTALL_DIR
+ARG LINK_DIR
+ARG OPEN_TEST_CASES_REPO_URL=https://github.com/pku-minic/open-test-cases.git
 
 # install autotest and open-test-cases
-# TODO
+WORKDIR ${BIN_INSTALL_DIR}
+COPY ${AUTOTEST} .
+RUN git clone --recursive --shallow-submodules --single-branch --depth 1 \
+  ${SYSYRT_REPO_URL} testcases
 
 WORKDIR /root
