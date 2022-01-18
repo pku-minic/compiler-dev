@@ -13,6 +13,6 @@
 * 必要的工具: `git`, `flex`, `bison`, `python3` (用于运行测试脚本).
 * 构建工具: `make`, `cmake`.
 * 运行工具: `qemu-user-static`.
-* 编译工具链: Rust 工具链, LLVM 工具链, RISC-V 工具链.
+* 编译工具链: Rust 工具链, LLVM 工具链.
 * Koopa IR 相关工具: `libkoopa`, `koopac`.
 * 测试脚本.
