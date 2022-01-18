@@ -1,5 +1,8 @@
 # macOS
 *.DS_Store
 
-# debugging
+# Debugging
 debug
+
+# Python
+__pycache__
