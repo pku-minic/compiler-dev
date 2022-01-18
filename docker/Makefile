@@ -15,13 +15,20 @@ KOOPAC_SRCS += $(KOOPAC_DIR)/Cargo.toml
 AUTOTEST_SRC := $(REPO_DIR)/autotest/autotest
 
 # targets
-KOOPAC := $(TOP_DIR)/koopac.tar.gz
-AUTOTEST := $(TOP_DIR)/autotest
+KOOPAC_NAME := koopac.tar.gz
+KOOPAC := $(TOP_DIR)/$(KOOPAC_NAME)
+AUTOTEST_NAME := autotest
+AUTOTEST := $(TOP_DIR)/$(AUTOTEST_NAME)
+
+# docker
+DOCKER_BUILD_FLAGS := --target $(DOCKER_BUILD_TARGET) -t $(DOCKER_IMAGE_NAME)
+DOCKER_BUILD_FLAGS += --build-arg KOOPAC=$(KOOPAC_NAME)
+DOCKER_BUILD_FLAGS += --build-arg AUTOTEST=$(AUTOTEST_NAME)
 
 .PHONY: docker clean
 
-docker: Dockerfile $(KOOPAC) $(AUTOTEST)
-	$(DOCKER) build --target $(DOCKER_BUILD_TARGET) -t $(DOCKER_IMAGE_NAME) .
+docker: $(TOP_DIR)/Dockerfile $(KOOPAC) $(AUTOTEST)
+	$(DOCKER) build $(DOCKER_BUILD_FLAGS) .
 
 clean:
 	-rm $(KOOPAC) $(AUTOTEST)
