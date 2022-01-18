@@ -1,0 +1,5 @@
+*
+!.gitignore
+!Dockerfile
+!Makefile
+!update-alternatives-clang.sh
