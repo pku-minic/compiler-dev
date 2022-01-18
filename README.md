@@ -6,7 +6,21 @@
 
 ## 使用方法
 
-> WIP.
+### 从 Docker Hub 获取
+
+推荐使用该方法.
+
+```sh
+docker run -it --rm maxxing/compiler-dev bash
+```
+
+### 从仓库构建
+
+```sh
+cd docker
+make # or `sudo make`
+docker run -it --rm compiler-dev bash
+```
 
 ## 镜像中包含的内容
 
