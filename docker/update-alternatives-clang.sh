@@ -50,7 +50,10 @@ function register_clang_version {
     --slave   /usr/bin/clang-tidy            clang-tidy            /usr/bin/clang-tidy-${version} \
     --slave   /usr/bin/lldb                  lldb                  /usr/bin/lldb-${version} \
     --slave   /usr/bin/lldb-server           lldb-server           /usr/bin/lldb-server-${version} \
-    --slave   /usr/bin/ld.lld                ld.lld                /usr/bin/ld.lld-${version}
+    --slave   /usr/bin/ld.lld                ld.lld                /usr/bin/ld.lld-${version} \
+    --slave   /usr/bin/lli                   lli                   /usr/bin/lli-${version} \
+    --slave   /usr/bin/llc                   llc                   /usr/bin/llc-${version} \
+    --slave   /usr/bin/opt                   opt                   /usr/bin/opt-${version}
 }
 
 register_clang_version $1 $2
