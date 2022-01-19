@@ -48,7 +48,7 @@ ENV RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # setup GitHub proxy
-RUN git config --global url."https://hub.fastgit.org/".insteadOf "https://github.com/" && \
+RUN git config --global url."https://github.com.cnpmjs.org/".insteadOf "https://github.com/" && \
   git config --global protocol.https.allow always
 
 # setup install directories
@@ -61,7 +61,8 @@ WORKDIR ${LIB_INSTALL_DIR}
 RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
   cargo build --release --manifest-path koopa/crates/libkoopa/Cargo.toml && \
   mkdir -p native && \
-  cp koopa/target/release/libkoopa.a koopa/target/release/libkoopa.so native && \
+  cp koopa/crates/libkoopa/target/release/libkoopa.a \
+    koopa/crates/libkoopa/target/release/libkoopa.so native && \
   rm -rf koopa
 
 # install koopac
@@ -88,15 +89,12 @@ RUN git clone --single-branch --depth 1 ${SYSYRT_REPO_URL} sysyrt && \
 FROM compiler-dev-base as compiler-dev
 
 # some arguments
-ARG AUTOTEST
-ARG BIN_INSTALL_DIR
-ARG LINK_DIR
 ARG OPEN_TEST_CASES_REPO_URL=https://github.com/pku-minic/open-test-cases.git
 
 # install autotest and open-test-cases
 WORKDIR ${BIN_INSTALL_DIR}
 COPY ${AUTOTEST} .
 RUN git clone --recursive --shallow-submodules --single-branch --depth 1 \
-  ${SYSYRT_REPO_URL} testcases
+  ${OPEN_TEST_CASES_REPO_URL} testcases
 
 WORKDIR /root
