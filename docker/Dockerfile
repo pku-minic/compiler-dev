@@ -60,7 +60,8 @@ ENV PATH="${BIN_INSTALL_DIR}:${PATH}"
 WORKDIR ${LIB_INSTALL_DIR}
 RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
   cargo build --release --manifest-path koopa/crates/libkoopa/Cargo.toml && \
-  cp koopa/target/release/libkoopa.a koopa/target/release/libkoopa.so . && \
+  mkdir -p native && \
+  cp koopa/target/release/libkoopa.a koopa/target/release/libkoopa.so native && \
   rm -rf koopa
 
 # install koopac
@@ -74,10 +75,12 @@ RUN mkdir kpc && tar xzf ${KOOPAC} -C kpc && \
 # install SysY runtime library
 WORKDIR ${LIB_INSTALL_DIR}
 RUN git clone --single-branch --depth 1 ${SYSYRT_REPO_URL} sysyrt && \
+  make -C sysyrt libsysy && \
+  mkdir -p native && cp sysyrt/build/libsysy.a native && \
   make NO_LIBC=1 \
        ADD_CFLAGS="-target riscv32-unknown-linux-elf -march=rv32im -mabi=ilp32" \
-       -C sysyrt libsysy && \
-  cp sysyrt/build/libsysy.a . && \
+       -C sysyrt clean libsysy && \
+  mkdir -p riscv32 && cp sysyrt/build/libsysy.a riscv32 && \
   rm -rf sysyrt
 
 
