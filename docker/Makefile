@@ -19,6 +19,8 @@ KOOPAC_NAME := koopac.tar.gz
 KOOPAC := $(TOP_DIR)/$(KOOPAC_NAME)
 AUTOTEST_NAME := autotest
 AUTOTEST := $(TOP_DIR)/$(AUTOTEST_NAME)
+BUILD_CONTEXT := $(TOP_DIR)/update-alternatives-clang.sh
+BUILD_CONTEXT += $(KOOPAC) $(AUTOTEST)
 
 # docker
 DOCKER_BUILD_FLAGS := --target $(DOCKER_BUILD_TARGET) -t $(DOCKER_IMAGE_NAME)
@@ -27,7 +29,7 @@ DOCKER_BUILD_FLAGS += --build-arg AUTOTEST=$(AUTOTEST_NAME)
 
 .PHONY: docker clean
 
-docker: $(TOP_DIR)/Dockerfile $(KOOPAC) $(AUTOTEST)
+docker: $(TOP_DIR)/Dockerfile $(BUILD_CONTEXT)
 	$(DOCKER) build $(DOCKER_BUILD_FLAGS) .
 
 clean:
