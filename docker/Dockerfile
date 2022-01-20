@@ -63,7 +63,7 @@ RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
   mkdir -p native && \
   cp koopa/crates/libkoopa/target/release/libkoopa.a \
     koopa/crates/libkoopa/target/release/libkoopa.so native && \
-  rm -rf koopa
+  rm -rf koopa /root/.cargo/registry
 
 # install koopac
 WORKDIR ${BIN_INSTALL_DIR}
@@ -71,7 +71,7 @@ COPY ${KOOPAC} .
 RUN mkdir kpc && tar xzf ${KOOPAC} -C kpc && \
   cargo build --release --manifest-path kpc/Cargo.toml && \
   cp kpc/target/release/koopac . && \
-  rm -rf ${KOOPAC} kpc
+  rm -rf ${KOOPAC} kpc /root/.cargo/registry
 
 # install SysY runtime library
 WORKDIR ${LIB_INSTALL_DIR}
