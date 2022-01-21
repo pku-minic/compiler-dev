@@ -5,5 +5,8 @@ authors = ["MaxXing <x@MaxXSoft.net>"]
 edition = "2021"
 description = "Koopa IR to LLVM IR converter."
 
+[[bin]]
+name = "koopac"
+
 [dependencies]
 koopa = "0.0.3"
