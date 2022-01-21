@@ -69,7 +69,7 @@ impl fmt::Display for Error {
     match self {
       Error::InvalidArguments => write!(
         f,
-        r#"usage: koopac [INPUT] [-o OUTPUT] [-h|--help]
+        r#"Usage: koopac [INPUT] [-o OUTPUT] [-h|--help]
 
 Options:
   INPUT:      input file, default to stdin
