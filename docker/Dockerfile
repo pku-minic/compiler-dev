@@ -6,8 +6,9 @@ ARG KOOPA_REPO_URL=https://github.com/pku-minic/koopa.git
 ARG KOOPAC=koopac.tar.gz
 ARG SYSYRT_REPO_URL=https://github.com/pku-minic/sysy-runtime-lib.git
 ARG AUTOTEST=autotest
-ARG LIB_INSTALL_DIR=/opt/lib
-ARG BIN_INSTALL_DIR=/opt/bin
+ARG INSTALL_DIR=/opt
+ARG LIB_INSTALL_DIR=${INSTALL_DIR}/lib
+ARG BIN_INSTALL_DIR=${INSTALL_DIR}/bin
 
 # setup APT mirror
 RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse" > /etc/apt/sources.list && \
@@ -66,11 +67,10 @@ RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
   rm -rf koopa /root/.cargo/registry
 
 # install koopac
-WORKDIR ${BIN_INSTALL_DIR}
+WORKDIR ${INSTALL_DIR}
 COPY ${KOOPAC} .
 RUN mkdir kpc && tar xzf ${KOOPAC} -C kpc && \
-  cargo build --release --manifest-path kpc/Cargo.toml && \
-  cp kpc/target/release/koopac . && \
+  cargo install --path kpc -root ${INSTALL_DIR} --no-track && \
   rm -rf ${KOOPAC} kpc /root/.cargo/registry
 
 # install SysY runtime library
