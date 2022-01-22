@@ -8,6 +8,7 @@ ARG SYSYRT_REPO_URL=https://github.com/pku-minic/sysy-runtime-lib.git
 ARG AUTOTEST=autotest
 ARG INSTALL_DIR=/opt
 ARG LIB_INSTALL_DIR=${INSTALL_DIR}/lib
+ARG INC_INSTALL_DIR=${INSTALL_DIR}/include
 ARG BIN_INSTALL_DIR=${INSTALL_DIR}/bin
 
 # setup APT mirror
@@ -55,6 +56,7 @@ RUN git config --global url."https://github.com.cnpmjs.org/".insteadOf "https://
 # setup install directories
 RUN mkdir -p ${LIB_INSTALL_DIR} ${BIN_INSTALL_DIR}
 ENV CDE_LIBRARY_PATH="${LIB_INSTALL_DIR}"
+ENV CDE_INCLUDE_PATH="${INC_INSTALL_DIR}"
 ENV PATH="${BIN_INSTALL_DIR}:${PATH}"
 
 # install libkoopa
@@ -64,6 +66,7 @@ RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
   mkdir -p native && \
   cp koopa/crates/libkoopa/target/release/libkoopa.a \
     koopa/crates/libkoopa/target/release/libkoopa.so native && \
+  cp -R koopa/crates/libkoopa/include/* ${INC_INSTALL_DIR} && \
   rm -rf koopa /root/.cargo/registry
 
 # install koopac
