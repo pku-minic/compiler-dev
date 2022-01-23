@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
 from dataclasses import dataclass
-from distutils import core
 from enum import Enum
 from os import path
-import sys
+import shutil
 import subprocess
+import sys
+import tempfile
 from typing import List, Optional
 
 
@@ -30,7 +31,7 @@ class CompilerInfo:
     '''
     Deletes the working directory.
     '''
-    pass
+    shutil.rmtree(self.working_dir)
 
 
 @dataclass(frozen=True)
@@ -60,13 +61,13 @@ class TestResult:
     '''
     Prints the details of the current test result to `stderr`.
     '''
-    pass
+    raise NotImplementedError
 
   def show_perf(self):
     '''
     Prints the performace test result to `stderr`.
     '''
-    pass
+    raise NotImplementedError
 
 
 def eprint(*args, **kwargs):
@@ -83,7 +84,11 @@ def compile_repo(repo_dir: str) -> CompilerInfo:
 
   Returns compiler information.
   '''
-  pass
+  working_dir = tempfile.mkdtemp()
+  try:
+    raise NotImplementedError
+  except:
+    shutil.rmtree(working_dir)
 
 
 def scan_test_cases(test_case_dir: str) -> List[TestCase]:
@@ -92,16 +97,16 @@ def scan_test_cases(test_case_dir: str) -> List[TestCase]:
 
   Returns the list of test case paths.
   '''
-  pass
+  raise NotImplementedError
 
 
-def run_test(mode: TestMode, compiler: str, case: TestCase) -> TestResult:
+def run_test(mode: TestMode, compiler: CompilerInfo, case: TestCase) -> TestResult:
   '''
   Runs the test for the given compiler by using the given test case.
 
   Returns test result.
   '''
-  pass
+  raise NotImplementedError
 
 
 def run_tests(mode: TestMode, compiler: CompilerInfo, cases: List[TestCase]):
@@ -110,7 +115,12 @@ def run_tests(mode: TestMode, compiler: CompilerInfo, cases: List[TestCase]):
 
   Prints test results to `stderr` when necessary.
   '''
-  pass
+  for case in cases:
+    eprint(f'running test "{case.name}" ... ', end='')
+    result = run_test(mode, compiler, case)
+    result.show_details()
+    if mode == TestMode.PERF:
+      result.show_perf()
 
 
 if __name__ == '__main__':
@@ -143,5 +153,7 @@ if __name__ == '__main__':
   compiler = compile_repo(args.repo_dir)
   try:
     run_tests(args.mode, compiler, test_cases)
+  except KeyboardInterrupt:
+    eprint(f'\033[0;33mINTERRUPTED\033[0m')
   finally:
     compiler.clean()
