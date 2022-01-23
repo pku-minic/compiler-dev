@@ -1,3 +1,147 @@
 #!/usr/bin/env python3
 
-# TODO!!
+from dataclasses import dataclass
+from distutils import core
+from enum import Enum
+from os import path
+import sys
+import subprocess
+from typing import List, Optional
+
+
+class TestMode(Enum):
+  '''
+  Test mode.
+  '''
+  KOOPA = 0
+  RISCV = 1
+  PERF = 2
+
+
+@dataclass(frozen=True)
+class CompilerInfo:
+  '''
+  Compiler related information.
+  '''
+  working_dir: str
+  compiler_file: str
+
+  def clean(self):
+    '''
+    Deletes the working directory.
+    '''
+    pass
+
+
+@dataclass(frozen=True)
+class TestCase:
+  '''
+  Test case information.
+  '''
+  source_file: str
+  output_file: str
+  input_file: Optional[str]
+
+  @property
+  def name(self) -> str:
+    return path.basename(self.source_file)
+
+
+@dataclass(frozen=True)
+class TestResult:
+  '''
+  Result of a single test.
+  '''
+  passed: bool
+  output: str
+  time: Optional[str]
+
+  def show_details(self):
+    '''
+    Prints the details of the current test result to `stderr`.
+    '''
+    pass
+
+  def show_perf(self):
+    '''
+    Prints the performace test result to `stderr`.
+    '''
+    pass
+
+
+def eprint(*args, **kwargs):
+  '''
+  Prints to `stderr`.
+  '''
+  print(*args, file=sys.stderr, **kwargs)
+  sys.stderr.flush()
+
+
+def compile_repo(repo_dir: str) -> CompilerInfo:
+  '''
+  Compiles the given repository.
+
+  Returns compiler information.
+  '''
+  pass
+
+
+def scan_test_cases(test_case_dir: str) -> List[TestCase]:
+  '''
+  Scans all test cases recursively in the given test case directory.
+
+  Returns the list of test case paths.
+  '''
+  pass
+
+
+def run_test(mode: TestMode, compiler: str, case: TestCase) -> TestResult:
+  '''
+  Runs the test for the given compiler by using the given test case.
+
+  Returns test result.
+  '''
+  pass
+
+
+def run_tests(mode: TestMode, compiler: CompilerInfo, cases: List[TestCase]):
+  '''
+  Runs test for all test cases.
+
+  Prints test results to `stderr` when necessary.
+  '''
+  pass
+
+
+if __name__ == '__main__':
+  # initialize argument parser
+  import argparse
+  parser = argparse.ArgumentParser(
+      description='An automated testing script for PKU compiler course.')
+  group = parser.add_mutually_exclusive_group()
+  group.add_argument('-koopa', action='store_const', const=TestMode.KOOPA,
+                     dest='mode', help='run SysY to Koopa IR test')
+  group.add_argument('-riscv', action='store_const', const=TestMode.RISCV,
+                     dest='mode', help='run SysY to RISC-V assembly test')
+  group.add_argument('-perf', action='store_const', const=TestMode.PERF,
+                     dest='mode', help='run performance test')
+  parser.set_defaults(mode=TestMode.KOOPA)
+  parser.add_argument('-t', '--test_case_dir',
+                      default=path.join(path.dirname(
+                          path.realpath(__file__)), 'testcases'),
+                      help='specify test case directory, ' +
+                           'default to SCRIPT_DIR/testcases')
+  parser.add_argument('repo_dir', type=str,
+                      help='compiler repository directory')
+
+  # parse arguments
+  args = parser.parse_args()
+  print(args)
+
+  # run test
+  test_cases = scan_test_cases(args.test_case_dir)
+  compiler = compile_repo(args.repo_dir)
+  try:
+    run_tests(args.mode, compiler, test_cases)
+  finally:
+    compiler.clean()
