@@ -25,6 +25,7 @@ ASM_TIMEOUT_SEC = 60
 RUN_TIMEOUT_SEC = 120
 RE_TOTAL_TIME = re.compile(r'TOTAL: (\d+H-\d+M-\d+S-\d+us)')
 
+
 @unique
 class TestMode(Enum):
   '''
@@ -117,13 +118,21 @@ class TestResult:
     '''
     Prints the details of the current test result to `stderr`.
     '''
-    raise NotImplementedError
+    eprint(self.status.to_msg())
+    if self.status == TestStatus.WRONG_ANSWER:
+      eprint('your answer:')
+      eprint(self.answer)
+    elif self.status != TestStatus.PASSED and self.output_error:
+      eprint('stdout:')
+      eprint(self.output_error[0])
+      eprint('stderr:')
+      eprint(self.output_error[1])
 
   def show_perf(self):
     '''
     Prints the performace test result to `stderr`.
     '''
-    raise NotImplementedError
+    eprint(f'time elapsed: {self.time}')
 
 
 def eprint(*args, **kwargs):
@@ -308,8 +317,8 @@ def asm_koopa(output: str, obj: str, exe: str) -> Optional[TestResult]:
   Converts Koopa IR to executable.
   '''
   if result := execute(f'llc --filetype=obj -o {obj}', ASM_TIMEOUT_SEC,
-                        TestStatus.ASM_ERROR, TestStatus.ASM_TIME_EXCEEDED,
-                        pipe_cmd=f'koopac {output}'):
+                       TestStatus.ASM_ERROR, TestStatus.ASM_TIME_EXCEEDED,
+                       pipe_cmd=f'koopac {output}'):
     return result
   lib_flag = f'-L{LIBRARY_PATH}/native -lsysy'
   cmd = f'clang {obj} {lib_flag} -o {exe}'
@@ -326,7 +335,7 @@ def asm_riscv(output: str, obj: str, exe: str) -> Optional[TestResult]:
   asm_flag = '-target riscv32-unknown-linux-elf -march=rv32im -mabi=ilp32'
   cmd = f'clang {output} -c -o {obj} {asm_flag}'
   if result := execute(cmd, ASM_TIMEOUT_SEC, TestStatus.ASM_ERROR,
-                        TestStatus.ASM_TIME_EXCEEDED):
+                       TestStatus.ASM_TIME_EXCEEDED):
     return result
   lib_flag = f'-L{LIBRARY_PATH}/riscv32 -lsysy'
   cmd = f'ld.lld {obj} {lib_flag} -o {exe}'
