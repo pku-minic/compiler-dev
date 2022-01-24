@@ -182,7 +182,7 @@ def execute(cmd: str, timeout: int, error_status: TestStatus,
     if pipe_cmd:
       pipe = subprocess.Popen(shlex.split(pipe_cmd), stdout=subprocess.PIPE,
                               stderr=subprocess.DEVNULL)
-      result = subprocess.run(shlex.split(cmd), timeout=timeout, stdin=pipe.stdin,
+      result = subprocess.run(shlex.split(cmd), timeout=timeout, stdin=pipe.stdout,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       pipe.wait()
     else:
@@ -267,7 +267,7 @@ def build_cargo_project(manifest: str, workding_dir: str) -> Tuple[str, str]:
   '''
   Returns build command and compile command of the given Cargo project.
   '''
-  flags = f'--manifest-path="{manifest}" --target-dir "{workding_dir}" --release'
+  flags = f'--manifest-path="{manifest}" --target-dir="{workding_dir}" --release'
   return (f'cargo build {flags}', f'cargo run {flags} -q --')
 
 
@@ -409,12 +409,20 @@ def run_tests(mode: TestMode, compiler: CompilerInfo, cases: List[TestCase]):
 
   Prints test results to `stderr` when necessary.
   '''
+  passed = 0
+  # run all tests
   for case in cases:
     eprint(f'running test "{case.name}" ... ', end='')
     result = run_test(mode, compiler, case)
     result.show_details()
-    if mode == TestMode.PERF:
-      result.show_perf()
+    if result.status == TestStatus.PASSED:
+      if mode == TestMode.PERF:
+        result.show_perf()
+      passed += 1
+  # print test result
+  total = len(cases)
+  status = TestStatus.PASSED if passed == total else TestStatus.WRONG_ANSWER
+  eprint(f'{status.to_msg()} ({passed}/{total})')
 
 
 if __name__ == '__main__':
