@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from compileall import compile_file
 from dataclasses import dataclass
 from enum import Enum, auto, unique
 import multiprocessing
@@ -166,7 +165,7 @@ def decode_bytes(b: bytes) -> str:
     return str(b)
 
 
-def decode_result(result: subprocess.CompletedProcess[str]) -> Tuple[str, str]:
+def decode_result(result: 'subprocess.CompletedProcess[str]') -> Tuple[str, str]:
   '''
   Decodes result returned by `subprocess.run`, extracts `stdout` and `stderr`.
   '''
@@ -181,7 +180,8 @@ def execute(cmd: str, timeout: int, error_status: TestStatus,
   '''
   try:
     if pipe_cmd:
-      pipe = subprocess.Popen(shlex.split(pipe_cmd), stdout=subprocess.PIPE)
+      pipe = subprocess.Popen(shlex.split(pipe_cmd), stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL)
       result = subprocess.run(shlex.split(cmd), timeout=timeout, stdin=pipe.stdin,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       pipe.wait()
@@ -263,13 +263,12 @@ def build_cmake_project(repo_dir: str, workding_dir: str) -> Tuple[str, str]:
   return (build_cmd, f'"{comp_cmd}"')
 
 
-def build_cargo_project(manifest_file: str) -> Tuple[str, str]:
+def build_cargo_project(manifest: str, workding_dir: str) -> Tuple[str, str]:
   '''
   Returns build command and compile command of the given Cargo project.
   '''
-  build_cmd = f'cargo build --manifest-path="{manifest_file}" --release'
-  comp_cmd = f'cargo run --manifest-path="{manifest_file}" --release -q --'
-  return (build_cmd, comp_cmd)
+  flags = f'--manifest-path="{manifest}" --target-dir "{workding_dir}" --release'
+  return (f'cargo build {flags}', f'cargo run {flags} -q --')
 
 
 def build_repo(repo_dir: str) -> Optional[CompilerInfo]:
@@ -285,8 +284,8 @@ def build_repo(repo_dir: str) -> Optional[CompilerInfo]:
       (build_cmd, compile_cmd) = build_make_project(repo_dir, working_dir)
     elif files_exists(repo_dir, 'CMakeLists.txt'):
       (build_cmd, compile_cmd) = build_cmake_project(repo_dir, working_dir)
-    elif manifest_file := files_exists(repo_dir, 'Cargo.toml'):
-      (build_cmd, compile_cmd) = build_cargo_project(manifest_file)
+    elif manifest := files_exists(repo_dir, 'Cargo.toml'):
+      (build_cmd, compile_cmd) = build_cargo_project(manifest, working_dir)
     else:
       eprint(f'repository "{repo_dir}" does not contain ' +
              'any build configurations')
@@ -320,8 +319,8 @@ def asm_koopa(output: str, obj: str, exe: str) -> Optional[TestResult]:
                        TestStatus.ASM_ERROR, TestStatus.ASM_TIME_EXCEEDED,
                        pipe_cmd=f'koopac {output}'):
     return result
-  lib_flag = f'-L{LIBRARY_PATH}/native -lsysy'
-  cmd = f'clang {obj} {lib_flag} -o {exe}'
+  lib_flags = f'-L{LIBRARY_PATH}/native -lsysy'
+  cmd = f'clang {obj} {lib_flags} -o {exe}'
   if result := execute(cmd, ASM_TIMEOUT_SEC, TestStatus.ASM_ERROR,
                        TestStatus.ASM_TIME_EXCEEDED):
     return result
@@ -332,13 +331,13 @@ def asm_riscv(output: str, obj: str, exe: str) -> Optional[TestResult]:
   '''
   Converts RISC-V assembly to executable.
   '''
-  asm_flag = '-target riscv32-unknown-linux-elf -march=rv32im -mabi=ilp32'
-  cmd = f'clang {output} -c -o {obj} {asm_flag}'
+  asm_flags = '-target riscv32-unknown-linux-elf -march=rv32im -mabi=ilp32'
+  cmd = f'clang {output} -c -o {obj} {asm_flags}'
   if result := execute(cmd, ASM_TIMEOUT_SEC, TestStatus.ASM_ERROR,
                        TestStatus.ASM_TIME_EXCEEDED):
     return result
-  lib_flag = f'-L{LIBRARY_PATH}/riscv32 -lsysy'
-  cmd = f'ld.lld {obj} {lib_flag} -o {exe}'
+  lib_flags = f'-L{LIBRARY_PATH}/riscv32 -lsysy'
+  cmd = f'ld.lld {obj} {lib_flags} -o {exe}'
   if result := execute(cmd, ASM_TIMEOUT_SEC, TestStatus.ASM_ERROR,
                        TestStatus.ASM_TIME_EXCEEDED):
     return result
