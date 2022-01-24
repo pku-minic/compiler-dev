@@ -73,7 +73,7 @@ RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
 WORKDIR ${INSTALL_DIR}
 COPY ${KOOPAC} .
 RUN mkdir kpc && tar xzf ${KOOPAC} -C kpc && \
-  cargo install --path kpc -root ${INSTALL_DIR} --no-track && \
+  cargo install --path kpc --root ${INSTALL_DIR} --no-track && \
   rm -rf ${KOOPAC} kpc /root/.cargo/registry
 
 # install SysY runtime library
