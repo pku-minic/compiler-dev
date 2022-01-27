@@ -284,10 +284,12 @@ def build_repo(repo_dir: str,
   Returns compiler information.
   '''
   # initialize working directory
-  clean_wd = False
   if not working_dir:
     working_dir = tempfile.mkdtemp()
     clean_wd = True
+  else:
+    working_dir = os.path.abspath(working_dir)
+    clean_wd = False
   eprint(f'working directory: {working_dir}')
   try:
     # check if is Make/CMake/Cargo project
