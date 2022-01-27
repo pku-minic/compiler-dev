@@ -53,12 +53,14 @@ class CompilerInfo:
   '''
   working_dir: str
   compile_cmd: str
+  clean_wd: bool
 
   def clean(self):
     '''
     Deletes the working directory.
     '''
-    shutil.rmtree(self.working_dir)
+    if self.clean_wd:
+      shutil.rmtree(self.working_dir)
 
 
 @dataclass(frozen=True)
@@ -274,13 +276,19 @@ def build_cargo_project(manifest: str, workding_dir: str) -> Tuple[str, str]:
   return (f'cargo build {flags}', f'cargo run {flags} -q --')
 
 
-def build_repo(repo_dir: str) -> Optional[CompilerInfo]:
+def build_repo(repo_dir: str,
+               working_dir: Optional[str] = None) -> Optional[CompilerInfo]:
   '''
   Builds the given repository.
 
   Returns compiler information.
   '''
-  working_dir = tempfile.mkdtemp()
+  # initialize working directory
+  clean_wd = False
+  if not working_dir:
+    working_dir = tempfile.mkdtemp()
+    clean_wd = True
+  eprint(f'working directory: {working_dir}')
   try:
     # check if is Make/CMake/Cargo project
     if files_exists(repo_dir, 'Makefile', 'makefile'):
@@ -306,11 +314,12 @@ def build_repo(repo_dir: str) -> Optional[CompilerInfo]:
         eprint(f'compiler "{compile_cmd}" not found')
         eprint('please check your Make/CMake build configuration')
         return None
-    return CompilerInfo(working_dir, compile_cmd)
+    return CompilerInfo(working_dir, compile_cmd, clean_wd)
   except Exception as e:
     eprint(e)
     # delete the working directory
-    shutil.rmtree(working_dir)
+    if clean_wd:
+      shutil.rmtree(working_dir)
     return None
 
 
@@ -446,6 +455,10 @@ if __name__ == '__main__':
                           os.path.realpath(__file__)), 'testcases'),
                       help='specify test case directory, ' +
                            'default to SCRIPT_DIR/testcases')
+  parser.add_argument('-w', '--working_dir',
+                      default=None,
+                      help='specify working directory, ' +
+                           'default to a temporary directory')
   parser.add_argument('repo_dir', type=str,
                       help='compiler repository directory')
 
@@ -459,7 +472,7 @@ if __name__ == '__main__':
     sys.exit(-1)
 
   # compile the repository
-  compiler = build_repo(args.repo_dir)
+  compiler = build_repo(args.repo_dir, args.working_dir)
   if not compiler:
     eprint(f'failed to compile the repository "{args.repo_dir}"')
     sys.exit(-1)
