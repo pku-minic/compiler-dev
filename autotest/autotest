@@ -11,14 +11,15 @@ import subprocess
 import sys
 import tempfile
 from typing import List, Optional, Tuple
+import uuid
 
 
 # some parameters
 LIBRARY_PATH = os.environ['CDE_LIBRARY_PATH']
 INCLUDE_PATH = os.environ['CDE_INCLUDE_PATH']
-TEMP_OUTPUT_FILE = 'output.S'
-TEMP_OBJECT_FILE = 'output.o'
-TEMP_EXECUTABLE_FILE = 'output'
+TEMP_OUTPUT_FILE = f'{str(uuid.uuid4()).replace("-", "")}.S'
+TEMP_OBJECT_FILE = f'{str(uuid.uuid4()).replace("-", "")}.o'
+TEMP_EXECUTABLE_FILE = f'{str(uuid.uuid4()).replace("-", "")}'
 COMP_TIMEOUT_SEC = 300
 ASM_TIMEOUT_SEC = 60
 RUN_TIMEOUT_SEC = 120
