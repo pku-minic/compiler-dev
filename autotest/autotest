@@ -182,10 +182,12 @@ def execute(cmd: str, timeout: int, error_status: TestStatus,
   try:
     if pipe_cmd:
       pipe = subprocess.Popen(shlex.split(pipe_cmd), stdout=subprocess.PIPE,
-                              stderr=subprocess.DEVNULL)
+                              stderr=subprocess.PIPE)
       result = subprocess.run(shlex.split(cmd), timeout=timeout, stdin=pipe.stdout,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      pipe.wait()
+      if pipe.wait():
+        return TestResult(error_status, output_error=(decode_bytes(pipe.stdout),
+                                                      decode_bytes(pipe.stderr)))
     else:
       result = subprocess.run(shlex.split(cmd), timeout=timeout,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
