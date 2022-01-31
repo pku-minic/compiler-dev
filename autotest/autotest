@@ -221,6 +221,7 @@ def scan_test_cases(test_case_dir: str) -> List[TestCase]:
   cases = []
   # walk in test case directory
   for root, _, files in os.walk(test_case_dir):
+    prefix = root.removeprefix(test_case_dir).lstrip('/')
     files = set(files)
     for file in files:
       # check if is SysY source file
@@ -235,6 +236,7 @@ def scan_test_cases(test_case_dir: str) -> List[TestCase]:
           input_file = os.path.join(
               root, in_file) if in_file in files else None
           # add to cases list
+          name = os.path.join(prefix, name)
           cases.append(TestCase(name, source_file, output_file, input_file))
   cases.sort(key=lambda x: x.source_file)
   return cases
@@ -461,6 +463,9 @@ if __name__ == '__main__':
                       default=None,
                       help='specify working directory, ' +
                            'default to a temporary directory')
+  parser.add_argument('-s', '--sub_dir',
+                      default=None,
+                      help='run testcases in the specific sub directory')
   parser.add_argument('repo_dir', type=str,
                       help='compiler repository directory')
 
@@ -468,9 +473,12 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   # scan test cases
-  cases = scan_test_cases(args.test_case_dir)
+  test_case_dir = os.path.abspath(args.test_case_dir)
+  if args.sub_dir:
+    test_case_dir = os.path.join(test_case_dir, args.sub_dir)
+  cases = scan_test_cases(test_case_dir)
   if not cases:
-    eprint(f'no test cases found in dierctory "{args.test_case_dir}"')
+    eprint(f'no test cases found in dierctory "{test_case_dir}"')
     sys.exit(-1)
 
   # compile the repository
