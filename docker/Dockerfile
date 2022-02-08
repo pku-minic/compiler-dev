@@ -92,12 +92,11 @@ RUN git clone --single-branch --depth 1 ${SYSYRT_REPO_URL} sysyrt && \
 FROM compiler-dev-base as compiler-dev
 
 # some arguments
-ARG OPEN_TEST_CASES_REPO_URL=https://github.com/pku-minic/open-test-cases.git
+ARG TEST_CASES_REPO_URL=https://github.com/pku-minic/compiler-dev-test-cases.git
 
-# install autotest and open-test-cases
+# install autotest and test cases
 WORKDIR ${BIN_INSTALL_DIR}
 COPY ${AUTOTEST} .
-RUN git clone --recursive --shallow-submodules --single-branch --depth 1 \
-  ${OPEN_TEST_CASES_REPO_URL} testcases
+RUN git clone --single-branch --depth 1 ${TEST_CASES_REPO_URL} testcases
 
 WORKDIR /root
