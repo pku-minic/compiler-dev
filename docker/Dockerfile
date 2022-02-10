@@ -49,10 +49,6 @@ ENV RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
 ENV RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# setup GitHub proxy
-RUN git config --global url."https://github.com.cnpmjs.org/".insteadOf "https://github.com/" && \
-  git config --global protocol.https.allow always
-
 # setup install directories
 RUN mkdir -p ${LIB_INSTALL_DIR} ${BIN_INSTALL_DIR}
 ENV CDE_LIBRARY_PATH="${LIB_INSTALL_DIR}"
@@ -97,6 +93,9 @@ ARG TEST_CASES_REPO_URL=https://github.com/pku-minic/compiler-dev-test-cases.git
 # install autotest and test cases
 WORKDIR ${BIN_INSTALL_DIR}
 COPY ${AUTOTEST} .
-RUN git clone --single-branch --depth 1 ${TEST_CASES_REPO_URL} testcases
+RUN git clone --single-branch --depth 1 ${TEST_CASES_REPO_URL} cd-test-cases && \
+  make LIB_DIR=${LIB_INSTALL_DIR}/native INSTALL_DIR=${BIN_INSTALL_DIR}/testcases \
+       -C cd-test-cases install -j`nproc` && \
+  rm -rf cd-test-cases
 
 WORKDIR /root
