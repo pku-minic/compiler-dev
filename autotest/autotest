@@ -212,6 +212,15 @@ def parse_time_info(stderr: str) -> str:
   return time
 
 
+def remove_prefix(s: str, prefix: str) -> str:
+  '''
+  Removes the prefix from the given string.
+  '''
+  if s.startswith(prefix):
+    return s[len(prefix):]
+  return s
+
+
 def scan_test_cases(test_case_dir: str) -> List[TestCase]:
   '''
   Scans all test cases recursively in the given test case directory.
@@ -221,7 +230,7 @@ def scan_test_cases(test_case_dir: str) -> List[TestCase]:
   cases = []
   # walk in test case directory
   for root, _, files in os.walk(test_case_dir):
-    prefix = root.removeprefix(test_case_dir).lstrip('/')
+    prefix = remove_prefix(root, test_case_dir).lstrip('/')
     files = set(files)
     for file in files:
       # check if is SysY source file
