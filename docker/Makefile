@@ -2,6 +2,7 @@
 DOCKER ?= docker
 DOCKER_BUILD_TARGET ?= compiler-dev
 DOCKER_IMAGE_NAME ?= compiler-dev
+DOCKER_BUILD_OPTS ?=
 
 # directories
 TOP_DIR := $(shell pwd)
@@ -24,7 +25,7 @@ BUILD_CONTEXT += $(KOOPAC) $(AUTOTEST)
 
 # docker
 DOCKER_BUILD_FLAGS := --target $(DOCKER_BUILD_TARGET) -t $(DOCKER_IMAGE_NAME)
-DOCKER_BUILD_FLAGS += --build-arg KOOPAC=$(KOOPAC_NAME)
+DOCKER_BUILD_FLAGS += $(DOCKER_BUILD_OPTS) --build-arg KOOPAC=$(KOOPAC_NAME)
 DOCKER_BUILD_FLAGS += --build-arg AUTOTEST=$(AUTOTEST_NAME)
 
 .PHONY: docker clean
