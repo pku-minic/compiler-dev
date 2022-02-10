@@ -480,6 +480,7 @@ if __name__ == '__main__':
 
   # parse arguments
   args = parser.parse_args()
+  eprint(f'run test in "{args.mode.to_opt()}" mode')
 
   # scan test cases
   test_case_dir = os.path.abspath(args.test_case_dir)
