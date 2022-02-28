@@ -34,3 +34,7 @@ docker run -it --rm compiler-dev bash
 ## 缺陷/待处理
 
 * [ ] 目前的镜像会安装各类预编译工具链 (例如 LLVM), 但其中部分工具链不支持 `aarch64`, 这也许会给使用搭载了 Apple Silicon 平台的同学带来困扰. 是否考虑从源代码编译?
+
+## 变更日志
+
+见 [CHANGELOG.md](CHANGELOG.md).
