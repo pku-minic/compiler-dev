@@ -168,7 +168,7 @@ def decode_bytes(b: bytes) -> str:
     return str(b)
 
 
-def decode_result(result: 'subprocess.CompletedProcess[str]') -> Tuple[str, str]:
+def decode_result(result: 'subprocess.CompletedProcess[bytes]') -> Tuple[str, str]:
   '''
   Decodes result returned by `subprocess.run`, extracts `stdout` and `stderr`.
   '''
@@ -188,8 +188,9 @@ def execute(cmd: str, timeout: int, error_status: TestStatus,
       result = subprocess.run(shlex.split(cmd), timeout=timeout, stdin=pipe.stdout,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       if pipe.wait():
-        return TestResult(error_status, output_error=(decode_bytes(pipe.stdout),
-                                                      decode_bytes(pipe.stderr)))
+        return TestResult(error_status,
+                          output_error=(decode_bytes(pipe.stdout.read()),
+                                        decode_bytes(pipe.stderr.read())))
     else:
       result = subprocess.run(shlex.split(cmd), timeout=timeout,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
