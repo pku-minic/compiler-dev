@@ -4,6 +4,10 @@
 
 ## 未发布
 
+### 变更
+
+* 将 `libkoopa` 和 `koopac` 的 `koopa` 依赖更新到 0.0.5 版本.
+
 ### 修复
 
 * `autotest` 脚本中关于 `Popen` 相关操作的问题.
