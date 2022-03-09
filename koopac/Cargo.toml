@@ -9,4 +9,4 @@ description = "Koopa IR to LLVM IR converter."
 name = "koopac"
 
 [dependencies]
-koopa = "0.0.4"
+koopa = "0.0.5"
