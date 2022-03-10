@@ -1,5 +1,8 @@
+mod reorder_alloc;
+
 use koopa::back::LlvmGenerator;
 use koopa::front::Driver;
+use koopa::opt::PassManager;
 use std::env::args;
 use std::fmt;
 use std::io::{stdin, stdout, Error as IoError};
@@ -39,13 +42,17 @@ fn try_main() -> Result<(), Error> {
     }
   }
   // read Koopa IR program from input
-  let program = match input {
+  let mut program = match input {
     Some(file) => Driver::from_path(file)
       .map_err(Error::InvalidInputFile)?
       .generate_program(),
     _ => Driver::from(stdin()).generate_program(),
   }
   .map_err(|_| Error::Parse)?;
+  // run passes
+  let mut passes = PassManager::new();
+  passes.register(reorder_alloc::ReorderAlloc::new_pass());
+  passes.run_passes(&mut program);
   // generate LLVM IR and write to output
   match output {
     Some(file) => LlvmGenerator::from_path(file)
