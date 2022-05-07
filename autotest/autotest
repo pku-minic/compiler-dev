@@ -390,12 +390,12 @@ def run_output(mode: TestMode, case: TestCase, exe: str) -> TestResult:
   # get actual output
   (stdout, stderr) = decode_result(result)
   if not stdout or stdout.endswith('\n'):
-    out = f'{stdout}{result.returncode}\n'
+    out = f'{stdout}{result.returncode}'
   else:
-    out = f'{stdout}\n{result.returncode}\n'
+    out = f'{stdout}\n{result.returncode}'
   # get expected output
   with open(case.output_file, mode='r', newline='') as f:
-    ref = f.read()
+    ref = f.read().rstrip()
   # get time information
   time = None
   if mode == TestMode.PERF:
