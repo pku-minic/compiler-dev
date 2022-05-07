@@ -1,7 +1,7 @@
 mod reorder_alloc;
 
 use koopa::back::LlvmGenerator;
-use koopa::front::Driver;
+use koopa::front::{span::Span, Driver};
 use koopa::opt::PassManager;
 use std::env::args;
 use std::fmt;
@@ -10,7 +10,8 @@ use std::process::exit;
 
 fn main() {
   match try_main() {
-    Err(error) if !matches!(error, Error::Parse) => {
+    Err(Error::Parse) => exit(Span::error_num() as i32),
+    Err(error) => {
       eprintln!("{}", error);
       exit(-1);
     }
