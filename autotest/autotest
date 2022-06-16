@@ -257,7 +257,7 @@ def build_make_project(repo_dir: str, working_dir: str) -> Tuple[str, str]:
   Returns build command and compile command of the given Make project.
   '''
   flags = f'LIB_DIR="{LIBRARY_PATH}/native" INC_DIR="{INCLUDE_PATH}"'
-  build_cmd = f'make BUILD_DIR="{working_dir}" {flags} -C "{repo_dir}"'
+  build_cmd = f'make DEBUG=0 BUILD_DIR="{working_dir}" {flags} -C "{repo_dir}"'
   comp_cmd = os.path.join(working_dir, 'compiler')
   return (build_cmd, f'"{comp_cmd}"')
 
