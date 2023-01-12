@@ -26,7 +26,7 @@ impl FunctionPass for ReorderAlloc {
       .filter_map(|(&v, value)| match value.kind() {
         ValueKind::Alloc(_) => {
           let bb = data.layout().parent_bb(v).unwrap();
-          (bb != entry).then(|| (v, bb))
+          (bb != entry).then_some((v, bb))
         }
         _ => None,
       })
