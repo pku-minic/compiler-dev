@@ -132,7 +132,7 @@ class TestResult:
 
   def show_perf(self):
     '''
-    Prints the performace test result to `stderr`.
+    Prints the performance test result to `stderr`.
     '''
     eprint(f'time elapsed: {self.time}')
 
@@ -489,7 +489,7 @@ if __name__ == '__main__':
     test_case_dir = os.path.join(test_case_dir, args.sub_dir)
   cases = scan_test_cases(test_case_dir)
   if not cases:
-    eprint(f'no test cases found in dierctory "{test_case_dir}"')
+    eprint(f'no test cases found in directory "{test_case_dir}"')
     sys.exit(-1)
 
   # compile the repository
