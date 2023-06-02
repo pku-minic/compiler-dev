@@ -42,7 +42,7 @@ RUN wget -O - https://sh.rustup.rs | sh -s -- -y && \
   echo "[source.crates-io]" > ~/.cargo/config && \
   echo "replace-with = 'tuna'" >> ~/.cargo/config && \
   echo "[source.tuna]" >> ~/.cargo/config && \
-  echo "registry = \"https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git\"" >> ~/.cargo/config
+  echo "registry = \"sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/\"" >> ~/.cargo/config
 ENV RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
 ENV RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 ENV PATH="/root/.cargo/bin:${PATH}"
