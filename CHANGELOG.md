@@ -7,6 +7,7 @@
 ### 变更
 
 * 将 `libkoopa` 和 `koopac` 的 `koopa` 依赖更新到 0.0.7 版本.
+* 将 Rust 工具链更新至 1.70.0, 同时启用 sparse registry.
 
 ## 0.0.7 - 2023-01-12
 
