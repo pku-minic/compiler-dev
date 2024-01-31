@@ -14,6 +14,18 @@ ARG BIN_INSTALL_DIR=${INSTALL_DIR}/bin
 # setup APT mirror
 RUN sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list && \
   sed -i "s@http://.*security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
+  
+# setup ca-certificates for https mirror
+RUN apt update 
+RUN apt upgrade ca-certificates --fix-missing -y
+
+# setup APT mirror for arm64, armhf, PowerPC, ppc64el, s390x
+RUN cat <<'EOF' > /etc/apt/sources.list
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse
+deb http://ports.ubuntu.com/ubuntu-ports/ focal-security main restricted universe multiverse
+EOF
 
 # install LLVM's APT
 RUN apt update && \
