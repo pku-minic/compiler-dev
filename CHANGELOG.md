@@ -2,6 +2,13 @@
 
 关于 `compiler-dev` Docker 镜像的所有变更将陈列至此.
 
+## 未发布
+
+### 变更
+
+* [PR #3](https://github.com/pku-minic/compiler-dev/pull/3): enabled Ubuntu-Ports mirror for arm64, armhf, PowerPC, ppc64el, s390x.
+* [PR #5](https://github.com/pku-minic/compiler-dev/pull/5): Change tuna mirror to llvm.org source.
+
 ## 0.0.8 - 2023-06-02
 
 ### 变更
