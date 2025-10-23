@@ -1,12 +1,12 @@
 [package]
 name = "koopac"
-version = "0.0.4"
+version = "0.0.5"
 authors = ["MaxXing <x@MaxXSoft.net>"]
-edition = "2021"
+edition = "2024"
 description = "Koopa IR to LLVM IR converter."
 
 [[bin]]
 name = "koopac"
 
 [dependencies]
-koopa = "0.0.7"
+koopa = "0.0.8"

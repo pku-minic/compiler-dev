@@ -8,6 +8,7 @@
 
 * [PR #3](https://github.com/pku-minic/compiler-dev/pull/3): enabled Ubuntu-Ports mirror for arm64, armhf, PowerPC, ppc64el, s390x.
 * [PR #5](https://github.com/pku-minic/compiler-dev/pull/5): Change tuna mirror to llvm.org source.
+* 将 `koopac` 的 `koopa` 依赖更新到 0.0.8 版本, 并支持 Rust 2024.
 
 ## 0.0.8 - 2023-06-02
 
