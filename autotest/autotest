@@ -188,6 +188,7 @@ def execute(cmd: str, timeout: int, error_status: TestStatus,
       result = subprocess.run(shlex.split(cmd), timeout=timeout, stdin=pipe.stdout,
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       if pipe.wait():
+        assert pipe.stdout is not None and pipe.stderr is not None
         return TestResult(error_status,
                           output_error=(decode_bytes(pipe.stdout.read()),
                                         decode_bytes(pipe.stderr.read())))
