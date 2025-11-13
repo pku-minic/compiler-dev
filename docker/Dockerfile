@@ -1,5 +1,5 @@
 # base image
-FROM ubuntu:20.04 as compiler-dev-base
+FROM ubuntu:24.04 as compiler-dev-base
 
 # some arguments
 ARG KOOPA_REPO_URL=https://github.com/pku-minic/koopa.git
@@ -11,41 +11,35 @@ ARG LIB_INSTALL_DIR=${INSTALL_DIR}/lib
 ARG INC_INSTALL_DIR=${INSTALL_DIR}/include
 ARG BIN_INSTALL_DIR=${INSTALL_DIR}/bin
 
-# setup APT mirror
-RUN sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list && \
-  sed -i "s@http://.*security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
-  
-# setup ca-certificates for https mirror
-RUN apt update 
-RUN apt upgrade ca-certificates --fix-missing -y
+# setup APT mirror for all architectures
+RUN sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list.d/ubuntu.sources && \
+  sed -i "s@http://.*security.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list.d/ubuntu.sources && \
+  sed -i "s@http://.*ports.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list.d/ubuntu.sources
 
-# setup APT mirror for arm64, armhf, PowerPC, ppc64el, s390x
-RUN cat <<'EOF' > /etc/apt/sources.list
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse
-deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse
-deb http://ports.ubuntu.com/ubuntu-ports/ focal-security main restricted universe multiverse
-EOF
-
-# install LLVM's APT
+# install LLVM's APT repository
 RUN apt update && \
-  DEBIAN_FRONTEND="noninteractive" apt install -y wget gnupg && \
-  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
-  echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal main" >> /etc/apt/sources.list && \
-  echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main" >> /etc/apt/sources.list && \
-  echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-13 main" >> /etc/apt/sources.list
+  DEBIAN_FRONTEND="noninteractive" apt install -y wget && \
+  wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key > /etc/apt/trusted.gpg.d/llvm.asc && \
+  cat > /etc/apt/sources.list.d/llvm.sources <<EOF
+Types: deb
+Architectures: amd64 arm64
+Signed-By: /etc/apt/trusted.gpg.d/llvm.asc
+URIs: http://apt.llvm.org/noble/
+Suites: llvm-toolchain-noble-21
+Components: main
+EOF
 
 # install necessary packages
 RUN apt update && DEBIAN_FRONTEND="noninteractive" apt install -y \
   git flex bison python3 \
   make cmake \
   qemu-user-static \
-  clang-13 lldb-13 lld-13
+  clang-21 lldb-21 lld-21
 
 # setup LLVM toolchain
 WORKDIR /root
 COPY update-alternatives-clang.sh .
-RUN bash update-alternatives-clang.sh 13 100 && \
+RUN bash update-alternatives-clang.sh 21 100 && \
   rm update-alternatives-clang.sh
 
 # install Rust toolchain
