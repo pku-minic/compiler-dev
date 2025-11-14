@@ -20,7 +20,7 @@ RUN sed -i "s@http://.*archive.ubuntu.com@http://mirrors.tuna.tsinghua.edu.cn@g"
 RUN apt update && \
   DEBIAN_FRONTEND="noninteractive" apt install -y wget && \
   wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key > /etc/apt/trusted.gpg.d/llvm.asc && \
-  cat > /etc/apt/sources.list.d/llvm.sources <<EOF
+  cat > /etc/apt/sources.list.d/llvm.sources << EOF
 Types: deb
 Architectures: amd64 arm64
 Signed-By: /etc/apt/trusted.gpg.d/llvm.asc
@@ -45,10 +45,14 @@ RUN bash update-alternatives-clang.sh 21 100 && \
 # install Rust toolchain
 RUN wget -O - https://sh.rustup.rs | sh -s -- -y && \
   mkdir -p ~/.cargo && \
-  echo "[source.crates-io]" > ~/.cargo/config && \
-  echo "replace-with = 'tuna'" >> ~/.cargo/config && \
-  echo "[source.tuna]" >> ~/.cargo/config && \
-  echo "registry = \"sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/\"" >> ~/.cargo/config
+  cat > ~/.cargo/config.toml << EOF
+[source.crates-io]
+replace-with = 'mirror'
+[source.mirror]
+registry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
+[registries.mirror]
+index = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
+EOF
 ENV RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
 ENV RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
 ENV PATH="/root/.cargo/bin:${PATH}"
