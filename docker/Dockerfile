@@ -66,11 +66,11 @@ ENV PATH="${BIN_INSTALL_DIR}:${PATH}"
 # install libkoopa
 WORKDIR ${LIB_INSTALL_DIR}
 RUN git clone --single-branch --depth 1 ${KOOPA_REPO_URL} koopa && \
-  cargo build --release --manifest-path koopa/crates/libkoopa/Cargo.toml && \
+  CARGO_PROFILE_RELEASE_PANIC=abort cargo build -r -p libkoopa --manifest-path koopa/Cargo.toml && \
   mkdir -p native && \
-  cp koopa/crates/libkoopa/target/release/libkoopa.a native && \
+  cp koopa/target/release/libkoopa.a native && \
   mkdir -p ${INC_INSTALL_DIR} && \
-  cp -R koopa/crates/libkoopa/include/* ${INC_INSTALL_DIR}/. && \
+  cp -R koopa/libkoopa/include/* ${INC_INSTALL_DIR}/. && \
   rm -rf koopa /root/.cargo/registry
 
 # install koopac
