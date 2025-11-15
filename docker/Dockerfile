@@ -1,5 +1,5 @@
 # base image
-FROM ubuntu:24.04 as compiler-dev-base
+FROM ubuntu:24.04 AS compiler-dev-base
 
 # some arguments
 ARG KOOPA_REPO_URL=https://github.com/pku-minic/koopa.git
@@ -93,7 +93,7 @@ RUN git clone --single-branch --depth 1 ${SYSYRT_REPO_URL} sysyrt && \
 
 
 # compiler development environment image
-FROM compiler-dev-base as compiler-dev
+FROM compiler-dev-base AS compiler-dev
 
 # some arguments
 ARG TEST_CASES_REPO_URL=https://github.com/pku-minic/compiler-dev-test-cases.git
