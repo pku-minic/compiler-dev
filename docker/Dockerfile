@@ -32,7 +32,7 @@ EOF
 # install necessary packages
 RUN apt update && DEBIAN_FRONTEND="noninteractive" apt install -y \
   git flex bison python3 \
-  make cmake \
+  make cmake bear \
   qemu-user-static \
   clang-21 clangd-21 lldb-21 lld-21
 
