@@ -10,7 +10,7 @@
 
 ### 变更
 
-* 将 `libkoopa` 和 `koopac` 的 `koopa` 依赖更新到 0.0.10 版本.
+* 将 `libkoopa` 和 `koopac` 的 `koopa` 依赖更新到 0.0.11 版本.
 
 ## 0.0.9 - 2025-11-15
 
